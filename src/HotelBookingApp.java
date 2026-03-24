@@ -1,107 +1,62 @@
+import java.io.*;
 import java.util.*;
 
-class BookingRequest {
-    String guestName;
-    String roomType;
+class InventoryData implements Serializable {
+    Map<String, Integer> inventory;
 
-    BookingRequest(String guestName, String roomType) {
-        this.guestName = guestName;
-        this.roomType = roomType;
+    InventoryData(Map<String, Integer> inventory) {
+        this.inventory = inventory;
     }
 }
 
-class BookingSystem {
+class PersistenceService {
 
-    Map<String, Integer> inventory = new HashMap<>();
-    Map<String, Integer> roomCounter = new HashMap<>();
-    Queue<BookingRequest> queue = new LinkedList<>();
+    private static final String FILE_NAME = "inventory.dat";
 
-    public BookingSystem() {
-        inventory.put("Single", 5);
-        inventory.put("Double", 3);
-        inventory.put("Suite", 2);
-
-        roomCounter.put("Single", 0);
-        roomCounter.put("Double", 0);
-        roomCounter.put("Suite", 0);
-    }
-
-    public synchronized void addRequest(BookingRequest request) {
-        queue.add(request);
-    }
-
-    public synchronized BookingRequest getRequest() {
-        return queue.poll();
-    }
-
-    public synchronized void processBooking(BookingRequest request) {
-
-        String type = request.roomType;
-
-        if (inventory.get(type) > 0) {
-            inventory.put(type, inventory.get(type) - 1);
-
-            int count = roomCounter.get(type) + 1;
-            roomCounter.put(type, count);
-
-            String roomId = type + "-" + count;
-
-            System.out.println("Booking confirmed for Guest: " + request.guestName + ", Room ID: " + roomId);
-        } else {
-            System.out.println("No rooms available for Guest: " + request.guestName);
+    public static void save(Map<String, Integer> inventory) {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME));
+            oos.writeObject(new InventoryData(inventory));
+            oos.close();
+            System.out.println("Inventory saved successfully.");
+        } catch (Exception e) {
+            System.out.println("Error saving inventory.");
         }
     }
 
-    public void printInventory() {
-        System.out.println("\nRemaining Inventory:");
-        for (String type : inventory.keySet()) {
-            System.out.println(type + ": " + inventory.get(type));
-        }
-    }
-}
-
-class BookingProcessor extends Thread {
-
-    BookingSystem system;
-
-    BookingProcessor(BookingSystem system) {
-        this.system = system;
-    }
-
-    public void run() {
-        while (true) {
-            BookingRequest request;
-
-            synchronized (system) {
-                request = system.getRequest();
-            }
-
-            if (request == null) break;
-
-            system.processBooking(request);
+    public static Map<String, Integer> load() {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));
+            InventoryData data = (InventoryData) ois.readObject();
+            ois.close();
+            return data.inventory;
+        } catch (Exception e) {
+            return null;
         }
     }
 }
 
 public class HotelBookingApp {
-    public static void main(String[] args) throws InterruptedException {
 
-        BookingSystem system = new BookingSystem();
+    public static void main(String[] args) {
 
-        system.addRequest(new BookingRequest("Abhi", "Single"));
-        system.addRequest(new BookingRequest("Vanmathi", "Double"));
-        system.addRequest(new BookingRequest("Kural", "Suite"));
-        system.addRequest(new BookingRequest("Subha", "Single"));
+        System.out.println("System Recovery");
 
-        Thread t1 = new BookingProcessor(system);
-        Thread t2 = new BookingProcessor(system);
+        Map<String, Integer> inventory = PersistenceService.load();
 
-        t1.start();
-        t2.start();
+        if (inventory == null) {
+            System.out.println("No valid inventory data found. Starting fresh.");
+            inventory = new HashMap<>();
+            inventory.put("Single", 5);
+            inventory.put("Double", 3);
+            inventory.put("Suite", 2);
+        }
 
-        t1.join();
-        t2.join();
+        System.out.println("\nCurrent Inventory:");
+        for (String type : inventory.keySet()) {
+            System.out.println(type + ": " + inventory.get(type));
+        }
 
-        system.printInventory();
+        PersistenceService.save(inventory);
     }
 }
