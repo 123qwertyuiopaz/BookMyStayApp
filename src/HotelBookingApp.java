@@ -1,5 +1,3 @@
-// UseCase4RoomSearch.java
-
 import java.util.*;
 
 class Room {
