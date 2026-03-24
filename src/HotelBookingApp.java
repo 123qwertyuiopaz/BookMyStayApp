@@ -1,12 +1,12 @@
 import java.util.*;
 
-class Reservation {
-    String guestName;
-    String roomType;
+class Service {
+    String name;
+    int cost;
 
-    Reservation(String guestName, String roomType) {
-        this.guestName = guestName;
-        this.roomType = roomType;
+    Service(String name, int cost) {
+        this.name = name;
+        this.cost = cost;
     }
 }
 
@@ -14,50 +14,37 @@ public class HotelBookingApp {
 
     public static void main(String[] args) {
 
-        Queue<Reservation> bookingQueue = new LinkedList<>();
+        Map<String, List<Service>> serviceMap = new HashMap<>();
 
-        bookingQueue.add(new Reservation("Abhi", "Single"));
-        bookingQueue.add(new Reservation("Subha", "Single"));
-        bookingQueue.add(new Reservation("Vanmathi", "Suite"));
+        String res1 = "R1";
+        String res2 = "R2";
 
-        Map<String, Integer> inventory = new HashMap<>();
-        inventory.put("Single", 2);
-        inventory.put("Double", 1);
-        inventory.put("Suite", 1);
+        List<Service> services1 = new ArrayList<>();
+        services1.add(new Service("Breakfast", 200));
+        services1.add(new Service("WiFi", 100));
 
-        Map<String, Set<String>> allocatedRooms = new HashMap<>();
+        List<Service> services2 = new ArrayList<>();
+        services2.add(new Service("Spa", 500));
 
-        System.out.println("Room Allocation Processing");
+        serviceMap.put(res1, services1);
+        serviceMap.put(res2, services2);
 
-        while (!bookingQueue.isEmpty()) {
+        System.out.println("Add-On Service Selection");
 
-            Reservation r = bookingQueue.poll();
+        for (String resId : serviceMap.keySet()) {
 
-            String type = r.roomType;
+            List<Service> list = serviceMap.get(resId);
 
-            if (inventory.getOrDefault(type, 0) > 0) {
+            int total = 0;
 
-                allocatedRooms.putIfAbsent(type, new HashSet<>());
+            System.out.println("Reservation ID: " + resId);
 
-                Set<String> roomSet = allocatedRooms.get(type);
-
-                String roomId = type + "-" + (roomSet.size() + 1);
-
-                while (roomSet.contains(roomId)) {
-                    roomId = type + "-" + (roomSet.size() + 1);
-                }
-
-                roomSet.add(roomId);
-
-                inventory.put(type, inventory.get(type) - 1);
-
-                System.out.println("Booking confirmed for Guest: "
-                        + r.guestName + ", Room ID: " + roomId);
-
-            } else {
-                System.out.println("Booking failed for Guest: "
-                        + r.guestName + " (No " + type + " rooms available)");
+            for (Service s : list) {
+                System.out.println("Service: " + s.name + ", Cost: " + s.cost);
+                total += s.cost;
             }
+
+            System.out.println("Total Add-On Cost: " + total);
         }
     }
 }
