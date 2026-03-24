@@ -2,13 +2,13 @@ import java.util.Queue;
 import java.util.LinkedList;
 
 
-class Service {
-    String name;
-    int cost;
+class Reservation {
+    String guestName;
+    String roomType;
 
-    Service(String name, int cost) {
-        this.name = name;
-        this.cost = cost;
+    Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
 }
 
@@ -17,37 +17,17 @@ public class HotelBookingApp {
 
     public static void main(String[] args) {
 
-        Map<String, List<Service>> serviceMap = new HashMap<>();
+        List<Reservation> bookingHistory = new ArrayList<>();
 
-        String res1 = "R1";
-        String res2 = "R2";
+        bookingHistory.add(new Reservation("Abhi", "Single"));
+        bookingHistory.add(new Reservation("Subha", "Double"));
+        bookingHistory.add(new Reservation("Vanmathi", "Suite"));
 
-        List<Service> services1 = new ArrayList<>();
-        services1.add(new Service("Breakfast", 200));
-        services1.add(new Service("WiFi", 100));
+        System.out.println("Booking History and Reporting\n");
+        System.out.println("Booking History Report");
 
-        List<Service> services2 = new ArrayList<>();
-        services2.add(new Service("Spa", 500));
-
-        serviceMap.put(res1, services1);
-        serviceMap.put(res2, services2);
-
-        System.out.println("Add-On Service Selection");
-
-        for (String resId : serviceMap.keySet()) {
-
-            List<Service> list = serviceMap.get(resId);
-
-            int total = 0;
-
-            System.out.println("Reservation ID: " + resId);
-
-            for (Service s : list) {
-                System.out.println("Service: " + s.name + ", Cost: " + s.cost);
-                total += s.cost;
-            }
-
-            System.out.println("Total Add-On Cost: " + total);
+        for (Reservation r : bookingHistory) {
+            System.out.println("Guest: " + r.guestName + ", Room Type: " + r.roomType);
         }
     }
 }
