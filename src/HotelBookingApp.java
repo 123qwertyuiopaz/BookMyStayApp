@@ -1,45 +1,35 @@
+import java.util.Queue;
+import java.util.LinkedList;
 
-import java.util.HashMap;
-import java.util.Map;
 
-class RoomInventory {
-    private Map<String, Integer> inventory;
+class Reservation {
+    String guestName;
+    String roomType;
 
-    public RoomInventory(Map<String, Integer> initialAvailability) {
-        this.inventory = new HashMap<>(initialAvailability);
-    }
 
-    public int getAvailability(String roomType) {
-        return inventory.getOrDefault(roomType, 0);
-    }
-
-    public void updateAvailability(String roomType, int newCount) {
-        if (newCount >= 0) {
-            inventory.put(roomType, newCount);
-        } else {
-            System.out.println("Invalid update: availability cannot be negative.");
-        }
-    }
-
-    public void displayInventory() {
-        System.out.println("HOTEL room  Inventory  status:");
-        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
-        }
+    Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
 }
 
+
 public class HotelBookingApp {
+
     public static void main(String[] args) {
-        Map<String, Integer> initialAvailability = new HashMap<>();
-        initialAvailability.put("Single", 10);
-        initialAvailability.put("Double", 5);
-        initialAvailability.put("Suite", 2);
-        RoomInventory roomInventory = new RoomInventory(initialAvailability);
-        roomInventory.displayInventory();
-        roomInventory.updateAvailability("Single", 8);
-        roomInventory.updateAvailability("Suite", 1);
-        roomInventory.displayInventory();
-        System.out.println("Available Double Rooms: " + roomInventory.getAvailability("Double"));
+
+        Queue<Reservation> bookingQueue = new LinkedList<>();
+
+        bookingQueue.add(new Reservation("Abhi", "Single"));
+        bookingQueue.add(new Reservation("Subha", "Double"));
+        bookingQueue.add(new Reservation("Vanmathi", "Suite"));
+
+        System.out.println("Booking Request Queue");
+
+        while (!bookingQueue.isEmpty()) {
+            Reservation r = bookingQueue.poll();
+            System.out.println("Processing booking for Guest: "
+                    + r.guestName + ", Room Type: " + r.roomType);
+        }
     }
 }
