@@ -1,77 +1,63 @@
-import java.util.Queue;
-import java.util.LinkedList;
 
+0import java.io.*;
+import java.util.*;
 
-class Booking {
-    String reservationId;
-    String roomType;
-    boolean isCancelled;
+class InventoryData implements Serializable {
+    Map<String, Integer> inventory;
 
-    Booking(String reservationId, String roomType) {
-        this.reservationId = reservationId;
-        this.roomType = roomType;
-        this.isCancelled = false;
+    InventoryData(Map<String, Integer> inventory) {
+        this.inventory = inventory;
     }
 }
 
-class CancellationService {
+class PersistenceService {
 
-    Map<String, Integer> inventory = new HashMap<>();
-    Map<String, Booking> bookings = new HashMap<>();
-    Stack<String> rollbackStack = new Stack<>();
+    private static final String FILE_NAME = "inventory.dat";
 
-    public CancellationService() {
-        inventory.put("Single", 5);
+    public static void save(Map<String, Integer> inventory) {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME));
+            oos.writeObject(new InventoryData(inventory));
+            oos.close();
+            System.out.println("Inventory saved successfully.");
+        } catch (Exception e) {
+            System.out.println("Error saving inventory.");
+        }
     }
 
-    public void addBooking(String reservationId, String roomType) {
-        Booking booking = new Booking(reservationId, roomType);
-        bookings.put(reservationId, booking);
-        inventory.put(roomType, inventory.get(roomType) - 1);
-    }
-
-    public void cancelBooking(String reservationId) {
-
-        System.out.println("Booking Cancellation");
-
-        if (!bookings.containsKey(reservationId)) {
-            System.out.println("Invalid reservation ID. Cancellation failed.");
-            return;
+    public static Map<String, Integer> load() {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));
+            InventoryData data = (InventoryData) ois.readObject();
+            ois.close();
+            return data.inventory;
+        } catch (Exception e) {
+            return null;
         }
-
-        Booking booking = bookings.get(reservationId);
-
-        if (booking.isCancelled) {
-            System.out.println("Booking already cancelled.");
-            return;
-        }
-
-        rollbackStack.push(reservationId);
-
-        String roomType = booking.roomType;
-        inventory.put(roomType, inventory.get(roomType) + 1);
-
-        booking.isCancelled = true;
-
-        System.out.println("Booking cancelled successfully. Inventory restored for room type: " + roomType);
-
-        System.out.println("\nRollback History (Most Recent First):");
-        for (int i = rollbackStack.size() - 1; i >= 0; i--) {
-            System.out.println("Released Reservation ID: " + rollbackStack.get(i));
-        }
-
-        System.out.println("\nUpdated " + roomType + " Room Availability: " + inventory.get(roomType));
     }
 }
-
 
 public class HotelBookingApp {
+
     public static void main(String[] args) {
 
-        CancellationService service = new CancellationService();
+        System.out.println("System Recovery");
 
-        service.addBooking("Single-1", "Single");
+        Map<String, Integer> inventory = PersistenceService.load();
 
-        service.cancelBooking("Single-1");
+        if (inventory == null) {
+            System.out.println("No valid inventory data found. Starting fresh.");
+            inventory = new HashMap<>();
+            inventory.put("Single", 5);
+            inventory.put("Double", 3);
+            inventory.put("Suite", 2);
+        }
+
+        System.out.println("\nCurrent Inventory:");
+        for (String type : inventory.keySet()) {
+            System.out.println(type + ": " + inventory.get(type));
+        }
+
+        PersistenceService.save(inventory);
     }
 }
