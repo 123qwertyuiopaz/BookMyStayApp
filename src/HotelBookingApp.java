@@ -1,4 +1,6 @@
-import java.util.*;
+import java.util.Queue;
+import java.util.LinkedList;
+
 
 class Service {
     String name;
@@ -9,6 +11,7 @@ class Service {
         this.cost = cost;
     }
 }
+
 
 public class HotelBookingApp {
 
