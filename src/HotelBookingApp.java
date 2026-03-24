@@ -1,75 +1,97 @@
-import java.util.*;
 
-class Room {
-    private String type;
-    private int beds;
-    private int sizeSqft;
-    private double pricePerNight;
-    private int available;
+abstract class Room {
+    private String roomType;
+    private int numberOfBeds;
+    private double size;
+    private double price;
 
-    public Room(String type, int beds, int sizeSqft, double pricePerNight, int available) {
-        this.type = type;
-        this.beds = beds;
-        this.sizeSqft = sizeSqft;
-        this.pricePerNight = pricePerNight;
-        this.available = available;
+    public Room(String roomType, int numberOfBeds, double size, double price) {
+        this.roomType = roomType;
+        this.numberOfBeds = numberOfBeds;
+        this.size = size;
+        this.price = price;
     }
 
-    public String getType() { return type; }
-    public int getBeds() { return beds; }
-    public int getSizeSqft() { return sizeSqft; }
-    public double getPricePerNight() { return pricePerNight; }
-    public int getAvailable() { return available; }
+    public String getRoomType() {
+        return roomType;
+    }
 
-    public boolean isAvailable() {
-        return available > 0;
+    public int getNumberOfBeds() {
+        return numberOfBeds;
+    }
+
+    public double getSize() {
+        return size;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public abstract void displayRoomDetails();
+}
+
+class SingleRoom extends Room {
+    public SingleRoom() {
+        super("Single Room", 1, 20.0, 50.0);
     }
 
     @Override
-    public String toString() {
-        return type + ":\n" +
-                "Beds: " + beds + "\n" +
-                "Size: " + sizeSqft + " sqft\n" +
-                "Price per night: " + pricePerNight + "\n" +
-                "Available: " + available + "\n";
+    public void displayRoomDetails() {
+        System.out.println(getRoomType()+":");
+        System.out.println("Beds: " + getNumberOfBeds());
+        System.out.println("Size: " + getSize() + " sqm");
+        System.out.println("Price per night: " + getPrice() + " per night");
     }
 }
 
-class Inventory {
-    private List<Room> rooms;
-
-    public Inventory() {
-        rooms = new ArrayList<>();
-        rooms.add(new Room("Single Room", 1, 250, 1500.0, 5));
-        rooms.add(new Room("Double Room", 2, 400, 2500.0, 3));
-        rooms.add(new Room("Suite Room", 3, 750, 5000.0, 2));
+class DoubleRoom extends Room {
+    public DoubleRoom() {
+        super("Double Room", 2, 35.0, 90.0);
     }
 
-    // Read-only access: returns a copy of available rooms
-    public List<Room> getAvailableRooms() {
-        List<Room> availableRooms = new ArrayList<>();
-        for (Room room : rooms) {
-            if (room.isAvailable()) {
-                availableRooms.add(room);
-            }
-        }
-        return availableRooms;
+    @Override
+    public void displayRoomDetails() {
+        System.out.println(getRoomType()+":");
+        System.out.println("Beds: " + getNumberOfBeds());
+        System.out.println("Size: " + getSize() + " sqm");
+        System.out.println("Price per night: " + getPrice() + " per night");
     }
 }
 
-public class HotelBookingApp {
+class SuiteRoom extends Room {
+    public SuiteRoom() {
+        super("Suite Room", 3, 60.0, 200.0);
+    }
+
+    @Override
+    public void displayRoomDetails() {
+        System.out.println(getRoomType()+":");
+        System.out.println("Beds: " + getNumberOfBeds());
+        System.out.println("Size: " + getSize() + " sqm");
+        System.out.println("Price per night: " + getPrice() + " per night");
+    }
+}
+
+public class RoomInitialization {
     public static void main(String[] args) {
-        Inventory inventory = new Inventory();
+        int singleRoomAvailability = 5;
+        int doubleRoomAvailability = 3;
+        int suiteRoomAvailability = 2;
 
-        System.out.println("Room Search Results:\n");
-        List<Room> availableRooms = inventory.getAvailableRooms();
+        Room single = new SingleRoom();
+        Room doubleR = new DoubleRoom();
+        Room suite = new SuiteRoom();
 
-        if (availableRooms.isEmpty()) {
-            System.out.println("No rooms available at the moment.");
-        } else {
-            for (Room room : availableRooms) {
-                System.out.println(room);
-            }
-        }
+
+        single.displayRoomDetails();
+        System.out.println("Availability: " + singleRoomAvailability + " rooms\n");
+
+        doubleR.displayRoomDetails();
+        System.out.println("Availability: " + doubleRoomAvailability + " rooms\n");
+
+        suite.displayRoomDetails();
+        System.out.println("Availability: " + suiteRoomAvailability + " rooms\n");
+
     }
 }
