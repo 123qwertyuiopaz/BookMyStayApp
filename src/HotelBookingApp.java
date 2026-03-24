@@ -5,17 +5,14 @@ import java.util.Map;
 class RoomInventory {
     private Map<String, Integer> inventory;
 
-    // Constructor initializes room availability
     public RoomInventory(Map<String, Integer> initialAvailability) {
         this.inventory = new HashMap<>(initialAvailability);
     }
 
-    // Method to get current availability of a room type
     public int getAvailability(String roomType) {
         return inventory.getOrDefault(roomType, 0);
     }
 
-    // Method to update availability in a controlled way
     public void updateAvailability(String roomType, int newCount) {
         if (newCount >= 0) {
             inventory.put(roomType, newCount);
@@ -24,7 +21,6 @@ class RoomInventory {
         }
     }
 
-    // Method to display current inventory state
     public void displayInventory() {
         System.out.println("HOTEL room  Inventory  status:");
         for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
